@@ -43,9 +43,11 @@ lintian check:
     - apt-get -y install lintian
     - dpkg-genchanges > ../pkg.changes
     - lintian ../pkg.changes
+    - mkdir publish
+    - cp ../*.deb publish/
   artifacts:
     paths:
-      - ../*.deb
+      - publish/*.deb
     expire_in: 1 week
 
 deployjob:
@@ -55,5 +57,5 @@ deployjob:
   script:
     - mkdir $ddir -p -v
     - chmod 777 $ddir
-    - mv -v ../*.deb $ddir
+    - mv -v publish/*.deb $ddir
     - touch /export/update-aptly
