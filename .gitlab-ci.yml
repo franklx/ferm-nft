@@ -44,7 +44,7 @@ lintian check:
     - dpkg-genchanges > ../pkg.changes
     - lintian ../pkg.changes
     - mkdir publish
-    - cp ../*.deb publish/
+    - cp *.deb publish/
   artifacts:
     paths:
       - publish/*.deb
