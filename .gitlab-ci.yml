@@ -1,7 +1,12 @@
 image: debian:bullseye
 
+variables:
+  destination_repo: ferm
+  ddir: /export/$destination_repo
+
 stages:
   - test
+  - deploy
 
 .download:
   script:
@@ -38,3 +43,17 @@ lintian check:
     - apt-get -y install lintian
     - dpkg-genchanges > ../pkg.changes
     - lintian ../pkg.changes
+  artifacts:
+    paths:
+      - ../*.deb
+    expire_in: 1 week
+
+deployjob:
+  stage: deploy
+  only:
+    - master
+  script:
+    - mkdir $ddir -p -v
+    - chmod 777 $ddir
+    - mv -v ../*.deb $ddir
+    - touch /export/update-aptly
