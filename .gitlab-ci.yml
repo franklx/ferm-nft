@@ -51,7 +51,7 @@ lintian check:
 deployjob:
   stage: deploy
   only:
-    - master
+    - main
   script:
     - mkdir $ddir -p -v
     - chmod 777 $ddir
