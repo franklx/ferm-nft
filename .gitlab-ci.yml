@@ -43,8 +43,9 @@ lintian check:
     - apt-get -y install lintian
     - dpkg-genchanges > ../pkg.changes
     - lintian ../pkg.changes
+    - cd ../
     - mkdir publish
-    - cp ../*.deb publish/
+    - cp *.deb publish/
   artifacts:
     paths:
       - publish/*.deb
