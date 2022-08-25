@@ -1,0 +1,4 @@
+Explanation: Prefer our custom, patched ferm over the Debian repositories
+Package: ferm
+Pin: origin apt.tuxis.nl
+Pin-Priority: 1001

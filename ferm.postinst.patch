@@ -1,0 +1,27 @@
+--- debian/ferm.postinst	2022-08-25 12:13:59.203134034 +0200
++++ debian/ferm.postinst	2022-08-25 12:14:19.575795771 +0200
+@@ -4,24 +4,6 @@
+ action=$1
+ version=$2
+
+-# generate default file if it doesn't exist
+-if [ ! -e /etc/default/ferm ]; then
+-	cat > /etc/default/ferm <<-END
+-	# configuration for /etc/init.d/ferm
+-
+-	# use iptables-restore for fast firewall initialization?
+-	FAST=yes
+-
+-	# cache the output of ferm --lines in /var/cache/ferm?
+-	CACHE=no
+-
+-	# additional paramaters for ferm (like --def '\$foo=bar')
+-	OPTIONS=
+-
+-	# Enable the ferm init script? (i.e. run on bootup)
+-	END
+-fi
+-
+ if [ "$action" = configure ]; then
+     . /usr/share/debconf/confmodule
+     db_version 2.0

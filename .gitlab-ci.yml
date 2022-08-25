@@ -1,0 +1,40 @@
+image: debian:bullseye
+
+stages:
+  - test
+
+.download:
+  script:
+    - echo "deb-src http://debmirror.tuxis.nl/debian/ bullseye main" >> /etc/apt/sources.list
+    - echo "deb-src http://security.debian.org/debian-security bullseye-security main" >> /etc/apt/sources.list
+    - echo "deb-src http://debmirror.tuxis.nl/debian/ bullseye-updates main" >> /etc/apt/sources.list
+    - apt-get update
+    - apt-get -y install quilt dpkg-dev build-essential devscripts equivs wget gnupg
+    - apt-get -y build-dep ferm
+    - apt-get source ferm
+    - cd $(find ferm-* -maxdepth 0 -type d | head -1)
+
+.customise:
+  script:
+    - !reference [.download, script]
+    - chmod +x ../customise_build.sh
+    - ../customise_build.sh
+
+.build:
+  script:
+    - !reference [.customise, script]
+    - dpkg-buildpackage -us -uc
+
+build test:
+  stage: test
+  script:
+    - !reference [.build, script]
+
+lintian check:
+  stage: test
+  script:
+    - !reference [.build, script]
+    - apt-get update
+    - apt-get -y install lintian
+    - dpkg-genchanges > ../pkg.changes
+    - lintian ../pkg.changes
