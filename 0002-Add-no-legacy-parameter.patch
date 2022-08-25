@@ -1,0 +1,91 @@
+From 2fc273a5ede1a69f273caefb75987820f04945e1 Mon Sep 17 00:00:00 2001
+From: William Edwards <wedwards@cyberfusion.nl>
+Date: Wed, 17 Aug 2022 11:17:54 +0200
+Subject: [PATCH] Add --no-legacy parameter
+
+Since commit 47b78b6, ferm always uses legacy xtables tools. This commit allows users to revert to the old behaviour.
+---
+ doc/ferm.pod |  5 +++++
+ src/ferm     | 22 ++++++++++++++--------
+ 2 files changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/doc/ferm.pod b/doc/ferm.pod
+index ab9b05c..12d2f6a 100644
+--- a/doc/ferm.pod
++++ b/doc/ferm.pod
+@@ -1973,6 +1973,11 @@ seconds (see B<--timeout>).  This is useful for remote firewall
+ administration: you can test the rules without fearing to lock
+ yourself out.
+ 
++=item B<--no-legacy>
++
++Do not use xtables-legacy tools.  This is useful for administrators
++that wish to use the newer nftables backend.
++
+ =item B<--timeout S>
+ 
+ If B<--interactive> is used, then roll back if there is no valid user
+diff --git a/src/ferm b/src/ferm
+index b2a9cda..01adead 100644
+--- a/src/ferm
++++ b/src/ferm
+@@ -611,6 +611,7 @@ unshift @stack, {};
+ # Get command line stuff
+ if ($has_getopt) {
+     my ($opt_noexec, $opt_flush, $opt_noflush, $opt_lines, $opt_interactive,
++        $opt_no_legacy,
+         $opt_timeout, $opt_help,
+         $opt_version, $opt_test, $opt_fast, $opt_slow, $opt_shell,
+         $opt_domain);
+@@ -643,6 +644,7 @@ if ($has_getopt) {
+                remote => \$opt_test,
+                fast => \$opt_fast,
+                slow => \$opt_slow,
++               'no-legacy' => \$opt_no_legacy,
+                shell => \$opt_shell,
+                'domain=s' => \$opt_domain,
+                'def=s' => \&opt_def,
+@@ -666,6 +668,7 @@ if ($has_getopt) {
+     $option{timeout} = defined $opt_timeout ? $opt_timeout : "30";
+     $option{test} = $opt_test;
+     $option{fast} = !$opt_slow;
++    $option{no_legacy} = $opt_no_legacy;
+     $option{shell} = $opt_shell;
+ 
+     die("ferm interactive mode not possible: /dev/stdin is not a tty\n")
+@@ -863,14 +866,16 @@ sub find_tool($) {
+     return $name if $option{test};
+     my @path = ('/usr/sbin', '/sbin', split ':', $ENV{PATH});
+ 
+-    if ($name =~ /^(.*tables)(.*)$/) {
+-        # prefer the "legacy" xtables tools the new nft based tools
+-        # are incompatible and sometimes break ferm
+-        my $legacy_name = $1 . '-legacy' . $2;
+-        foreach my $path (@path) {
+-            my $ret = "$path/$legacy_name";
+-            return $ret if -x $ret;
+-        }
++    if (!$option{no_legacy}) {
++      if ($name =~ /^(.*tables)(.*)$/) {
++          # prefer the "legacy" xtables tools the new nft based tools
++          # are incompatible and sometimes break ferm
++          my $legacy_name = $1 . '-legacy' . $2;
++          foreach my $path (@path) {
++              my $ret = "$path/$legacy_name";
++              return $ret if -x $ret;
++          }
++      }
+     }
+ 
+     foreach my $path (@path) {
+@@ -3119,6 +3124,7 @@ B<ferm> I<options> I<inputfiles>
+  -V, --version     Show current version number
+  -h, --help        Look at this text
+  --slow            Slow mode, don't use iptables-restore
++ --no-legacy       Do not use xtables-legacy tools.
+  --shell           Generate a shell script which calls iptables-restore
+  --domain {ip|ip6} Handle only the specified domain
+  --def '$name=v'   Override a variable
+-- 
+2.30.1 (Apple Git-130)
+
