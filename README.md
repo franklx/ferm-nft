@@ -1,4 +1,4 @@
-The program [ferm](https://github.com/MaxKellermann/ferm) allows you to write a human-readable configuration, which is converted to iptables rules.
+The program [ferm](https://github.com/MaxKellermann/ferm) allows you to write a human-readable firewall configuration, which is converted to iptables rules.
 
 In Debian, iptables is being [replaced](https://wiki.debian.org/nftables#Should_I_replace_an_iptables_firewall_with_a_nftables_one.3F) by nftables.
 
