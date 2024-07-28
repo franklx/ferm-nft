@@ -1,1 +1,5 @@
 .DS_Store
+ferm-2.5.1
+*.deb
+*.buildinfo
+*.changes

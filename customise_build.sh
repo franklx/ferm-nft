@@ -7,6 +7,15 @@ BASENAME=/usr/bin/basename
 PATCH=/usr/bin/patch
 CP=/bin/cp
 DCH=/usr/bin/dch
+CURL=/usr/bin/curl
+TAR=/usr/bin/tar
+
+$CURL -o /tmp/ferm.tar.xz https://deb.debian.org/debian/pool/main/f/ferm/ferm_2.5.1.orig.tar.xz
+$CURL -o /tmp/ferm-debian.tar.xz https://deb.debian.org/debian/pool/main/f/ferm/ferm_2.5.1-1.1.debian.tar.xz
+
+$TAR Jxvf /tmp/ferm.tar.xz
+cd ferm-2.5.1
+$TAR Jxvf /tmp/ferm-debian.tar.xz
 
 # Add code patch
 
@@ -23,5 +32,10 @@ $CP ../ferm.default debian/ferm.default
 
 # Update changelog
 
-DEBEMAIL="$GITLAB_USER_EMAIL" DEBFULLNAME="$GITLAB_USER_NAME" $DCH --local local 'Add --no-legacy patch'
-DEBEMAIL="$GITLAB_USER_EMAIL" DEBFULLNAME="$GITLAB_USER_NAME" $DCH --release ""
+export DEBEMAIL="flucchini@gmail.com"
+export DEBFULLNAME="Franco Lucchini"
+
+$DCH --local frk 'Add --no-legacy patch'
+$DCH --release ""
+
+rm /tmp/ferm*.tar.xz
